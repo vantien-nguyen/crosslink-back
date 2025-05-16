@@ -1,0 +1,10 @@
+{
+    "upsell_create_form" : {
+        "name": "Test Upsell Widget",
+        "offer_name": "{{ first_name }}, Special Offer",
+        "offer_description": "Dont miss our good offer and save your money",
+        "status": "active",
+        "discount_value": 11.12,
+        "discount_type": "percentage"
+    }
+}

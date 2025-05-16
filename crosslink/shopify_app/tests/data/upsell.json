@@ -1,0 +1,36 @@
+{
+    "mocked_data": {
+        "name": "TEST DELETED UPSELL WIDGET",
+        "description": "This is a test upsell widget",
+        "offer_name": "{{ first_name }}, Special Offer",
+        "offer_description": "Dont miss our good offer and save your money",
+        "status": "active",
+        "discount": null
+    },
+    "mocked_token": {
+        "input_data":{
+            "initialPurchase":{
+                "referenceId":"b1905cc7f89ddc418538adb32247fb7f",
+                "customerId": 6596242473189,
+                "lineItems":[
+                    {
+                        "product":{
+                            "title":"Chargeur Rapide 20W"
+                        },
+                        "quantity":1,
+                        "totalPriceSet":{
+                            "shopMoney":{
+                                "amount":"19.00",
+                                "currencyCode":"EUR"
+                            },
+                            "presentmentMoney":{
+                                "amount":"19.00",
+                                "currencyCode":"EUR"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

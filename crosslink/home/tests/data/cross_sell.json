@@ -1,0 +1,38 @@
+{
+    "cross_sell_widget_create_form": {
+        "name": "Test Widget Creation",
+        "discount": {
+            "code": "TESTCODE",
+            "value": 11.12,
+            "value_type": "percentage",
+            "status": "active"
+        }
+    },
+    "mock_return_discount_value_error": {
+        "error": "Code should be unique."
+    },
+    "mock_return_discount_value_success_created": {
+        "data": {
+            "discountCodeBasicCreate": {
+                "codeDiscountNode": {
+                    "id": "gid://shopify/DiscountCodeNode/13621832623",
+                    "codeDiscount": {
+                        "status": "active"
+                    }
+                }
+            }
+        }
+    },
+    "mock_return_discount_value_success_updated": {
+        "data": {
+            "discountCodeBasicUpdate": {
+                "codeDiscountNode": {
+                    "id": "gid://shopify/DiscountCodeNode/13621832623",
+                    "codeDiscount": {
+                        "status": "active"
+                    }
+                }
+            }
+        }
+    }
+}

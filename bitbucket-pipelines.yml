@@ -1,0 +1,99 @@
+image: atlassian/default-image:3
+options:
+  docker: True
+
+definitions:
+  services:
+    docker:
+      memory: 3072
+
+static_check: &static_check_and_tests
+  name: Static code checks & tests
+  size: 2x
+  script:
+    - docker build -f deployment/test/Dockerfile -t backend .
+    - docker run backend black --check crosslink/
+    - docker run backend isort --check-only crosslink/
+    - docker run backend pyright --warnings
+    - >-
+      docker run --name=postgres --detach
+      -e POSTGRES_DB="test"
+      -e POSTGRES_USER="crosslink"
+      -e POSTGRES_PASSWORD="crosslink"
+      -e POSTGRES_HOST="postgres"
+      -e POSTGRES_PORT="5432"
+      postgres:13
+    - >-
+      docker run --link postgres:postgres
+      -e DJANGO_SETTINGS_MODULE="configs.settings.tests"
+      -e DATABASE_URL="postgres://crosslink:crosslink@postgres/test"
+      -e POSTGRES_DB="test"
+      -e POSTGRES_USER="crosslink"
+      -e POSTGRES_PASSWORD="crosslink"
+      -e POSTGRES_HOST="postgres"
+      -e POSTGRES_PORT="5432"
+      -e SECRET_KEY=${SECRET_KEY}
+      -e APP_HOST=${APP_HOST}
+      -e SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      -e SHOPIFY_API_SECRET_KEY=${SHOPIFY_API_SECRET_KEY}
+      -e CLIENT_APP_HOST=${CLIENT_APP_HOST}
+      backend /entrypoint.sh
+  services:
+    - docker
+
+deploy_to_production_aws: &deploy_to_production_aws
+  name: Deploy Backend to AWS
+  deployment: production
+  script:
+    # Install and login to AWS.
+    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+    - unzip awscliv2.zip
+    - ./aws/install 
+    - aws --version
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $URI
+
+    # Build and push backend image.
+    - docker build -t $AWS_BACKEND_IMAGE_NAME:$AWS_BACKEND_IMAGE_VERSION -f deployment/production/backend/Dockerfile .
+    - docker tag $AWS_BACKEND_IMAGE_NAME:$AWS_BACKEND_IMAGE_VERSION $URI/$AWS_BACKEND_IMAGE_NAME:$AWS_BACKEND_IMAGE_VERSION
+    - docker push $URI/$AWS_BACKEND_IMAGE_NAME:$AWS_BACKEND_IMAGE_VERSION
+    - export IMAGE_NAME="${URI}/$AWS_BACKEND_IMAGE_NAME:${AWS_BACKEND_IMAGE_VERSION}"
+    - envsubst < deployment/production/task-definitions/backend.json >  task-definition-backend.json
+    - for taskarn in $(aws ecs list-tasks --cluster $AWS_CLUSTER_NAME --service $AWS_BACKEND_SERVICE_NAME --desired-status RUNNING --output text --query 'taskArns'); do aws ecs stop-task --cluster $AWS_CLUSTER_NAME --task $taskarn; done;
+
+    # Update the backend task definition.
+    - pipe: atlassian/aws-ecs-deploy:1.0.0
+      variables:
+        AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+        AWS_DEFAULT_REGION: $AWS_REGION
+        CLUSTER_NAME: $AWS_CLUSTER_NAME
+        SERVICE_NAME: $AWS_BACKEND_SERVICE_NAME
+        TASK_DEFINITION: 'task-definition-backend.json'
+        IMAGE_NAME: "${URI}/${AWS_BACKEND_IMAGE_NAME}:${AWS_BACKEND_IMAGE_VERSION}"
+        FORCE_NEW_DEPLOYMENT: "true"
+    
+    # Build and push worker image.
+    - docker build -t $AWS_WORKER_IMAGE_NAME:$AWS_WORKER_IMAGE_VERSION -f deployment/production/worker/Dockerfile .
+    - docker tag $AWS_WORKER_IMAGE_NAME:$AWS_WORKER_IMAGE_VERSION $URI/$AWS_WORKER_IMAGE_NAME:$AWS_WORKER_IMAGE_VERSION
+    - docker push $URI/$AWS_WORKER_IMAGE_NAME:$AWS_WORKER_IMAGE_VERSION
+    - export IMAGE_NAME="${URI}/${AWS_WORKER_IMAGE_NAME}:${AWS_WORKER_IMAGE_VERSION}"
+    - envsubst < deployment/production/task-definitions/worker.json >  task-definition-worker.json
+    - for taskarn in $(aws ecs list-tasks --cluster $AWS_CLUSTER_NAME --service $AWS_WORKER_SERVICE_NAME --desired-status RUNNING --output text --query 'taskArns'); do aws ecs stop-task --cluster $AWS_CLUSTER_NAME --task $taskarn; done;
+
+    # Update the worker task definition.
+    - pipe: atlassian/aws-ecs-deploy:1.0.0
+      variables:
+        AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+        AWS_DEFAULT_REGION: $AWS_REGION
+        CLUSTER_NAME: $AWS_CLUSTER_NAME
+        SERVICE_NAME: $AWS_WORKER_SERVICE_NAME
+        TASK_DEFINITION: 'task-definition-worker.json'
+        IMAGE_NAME: "${URI}/${AWS_WORKER_IMAGE_NAME}:${AWS_WORKER_IMAGE_VERSION}"
+        FORCE_NEW_DEPLOYMENT: "true"
+
+pipelines:
+  branches:
+    main:
+      - step: *static_check_and_tests
+      - step: *deploy_to_production_aws

@@ -1,0 +1,394 @@
+{
+    "shops_data": [
+        {
+            "shop_url": "vantien-nguyen.myshopify.com",
+            "name": "vantien-nguyen",
+            "email": "vantien.nguyen.fr@gmail.com",
+            "access_token": "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",
+            "test": false,
+            "logo_uploaded": true,
+            "logo_extension": null,
+            "cms": "Shopfiy",
+            "user": {
+                "email": "vantien.nguyen.fr@gmail.com",
+                "password": "tien@123",
+                "first_name": "Van Tien",
+                "last_name": "NGUYEN",
+                "is_active": true,
+                "shop_url": "vantien-nguyen.myshopify.com"
+            }
+        },
+
+        {
+            "shop_url": "crosslink-dev.myshopify.com",
+            "name": "crosslink-dev",
+            "email": "vantien.nguyen.fr@gmail.com",
+            "access_token": "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",
+            "test": false,
+            "logo_uploaded": false,
+            "logo_extension": null,
+            "cms": "Shopfiy",
+            "user": {
+                "email": "crosslink-dev@gmail.com",
+                "password": "tien@123",
+                "first_name": "Van Tien",
+                "last_name": "NGUYEN",
+                "is_active": true,
+                "shop_url": "crosslink-dev.myshopify.com"
+            }
+        },
+
+        {
+            "shop_url": "crosslink-dev-1.myshopify.com",
+            "name": "crosslink-dev-1",
+            "email": "vantien.nguyen.fr@gmail.com",
+            "access_token": "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",
+            "test": false,
+            "logo_uploaded": false,
+            "logo_extension": null,
+            "cms": "Shopfiy",
+            "user": {
+                "email": "crosslink-dev-1@gmail.com",
+                "password": "tien@123",
+                "first_name": "Van Tien",
+                "last_name": "NGUYEN",
+                "is_active": true,
+                "shop_url": "crosslink-dev-1.myshopify.com"
+            },
+            "cross_sell_widgets": [
+                {
+                    "name": "CROSS DEV 1 TEST",
+                    "status": "active",
+                    "shop_id": 3,
+                    "cms_product_ids": ["8952245649639", "8818157715687", "8818002362599"]
+                }
+            ]
+        }
+    ],
+
+    "upsell_widgets": [
+        {
+            "shop_url": "vantien-nguyen.myshopify.com",
+            "name": "UpsellVanTien",
+            "status": "active",
+            "offer_name": "Hello, It's not too late to add this to your order",
+            "offer_description": "Exclusive offer will be expired soon",
+            "upsell_product_id": "7191679729743",
+            "trigger_product_ids": [],
+            "discount_value": 11.00,
+            "discount_type": "percentage",
+            "upsell_impressions": [
+                {
+                    "order_id": null,
+                    "checkout_token": "471de81bca2be7569a1ef863ae16ef5c",
+                    "customer_id": null,
+                    "customer_email": null,
+                    "customer_first_name": null,
+                    "customer_last_name": null,
+                    "page_url": null,
+                    "upsell_conversion": {
+                        "variant_id": 17,
+                        "quantity": 1
+                    }
+                }
+            ]
+        },
+        {
+            "shop_url": "crosslink-dev.myshopify.com",
+            "name": "CrossDevUPSELL",
+            "status": "active",
+            "offer_name": "Hello, It's not too late to add this to your order",
+            "offer_description": "Exclusive offer will be expired soon",
+            "upsell_product_id": "9228661784852",
+            "trigger_product_ids": [],
+            "discount_value": 12.00,
+            "discount_type": "percentage",
+            "upsell_impressions": [
+                {
+                    "order_id": null,
+                    "checkout_token": "0ea2742b1d482359a7960dfac2cd9675",
+                    "customer_id": null,
+                    "customer_email": null,
+                    "customer_first_name": null,
+                    "customer_last_name": null,
+                    "page_url": null,
+                    "upsell_conversion": {
+                        "variant_id": 36,
+                        "quantity": 2
+                    }
+                }
+            ]
+        },
+        {
+            "shop_url": "crosslink-dev-1.myshopify.com",
+            "name": "UPSELL111111",
+            "status": "active",
+            "shop_id": 3,
+            "offer_name": "Hello, It's not too late to add this to your order",
+            "offer_description": "Exclusive offer will be expired soon",
+            "upsell_product_id": "8952245649639",
+            "trigger_product_ids": [],
+            "discount_value": 12.11,
+            "discount_type": "percentage",
+            "upsell_impressions": []
+        }
+    ],
+
+    "discounts": [
+        {
+            "shop_url": "vantien-nguyen.myshopify.com",
+            "code": "CROSSDEVVVVTien",
+            "value": 11.00,
+            "value_type": "percentage",
+            "status": "active",
+            "start_date": "2024-07-11",
+            "end_date": null,
+            "cms_discount_id": "1118372266063"
+        },
+        {
+            "shop_url": "crosslink-dev.myshopify.com",
+            "code": "CROSSDEVVF",
+            "value": 12.00,
+            "value_type": "fixed_amount",
+            "status": "active",
+            "start_date": "2024-07-11",
+            "end_date": null,
+            "cms_discount_id": "1463636164884"
+        },
+        {
+            "shop_url": "crosslink-dev-1.myshopify.com",
+            "code": "CROSSDEVVVV111111",
+            "value": 11.12,
+            "value_type": "percentage",
+            "status": "active",
+            "start_date": "2024-07-11",
+            "end_date": null,
+            "cms_discount_id": "1384103706855"
+        }
+    ],
+
+    "cross_sell_widgets": [
+        {
+            "shop_url": "vantien-nguyen.myshopify.com",
+            "name": "CrossSell-VanTien",
+            "status": "active",
+            "cms_product_ids": [
+                "7191679533135",
+                "7191679959119",
+                "7515974565967",
+                "7191679729743",
+                "7191679565903",
+                "7191679926351"
+            ],
+            "cross_sell_impressions": [
+                {
+                    "order_id": 5968517300455,
+                    "checkout_token": "0e60eaba848bcccddbeabd1953692991",
+                    "customer_id": 7557723226343,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "page_url": "https://crosslink-dev-1.myshopify.com/checkouts/cn/f78a8927b0c746324ab400d5df9395ea/thank_you",
+                    "purchase_shop_url": "crosslink-dev-1.myshopify.com",
+                    "recommended_shop_urls": [
+                        "vantien-nguyen.myshopify.com",
+                        "crosslink-dev.myshopify.com"
+                    ],
+                    "clicks": []
+                },
+                {
+                    "order_id": 5957795315988,
+                    "checkout_token": "0ea2742b1d482359a7960dfac2cd9675",
+                    "customer_id": 7964211052820,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "page_url": "https://crosslink-dev.myshopify.com/checkouts/cn/cee498f1df6bc482e99e66b06b28ccd0/thank_you",
+                    "purchase_shop_url": "crosslink-dev.myshopify.com",
+                    "recommended_shop_urls": [
+                        "crosslink-dev-1.myshopify.com",
+                        "vantien-nguyen.myshopify.com"
+                    ],
+                    "clicks": [
+                        {
+                            "purchase_shop_url": "crosslink-dev.myshopify.com",
+                            "rdir": "https://vantien-nguyen.myshopify.com/discount/CROSSDEVVVVTien?redirect=%2Fproducts%2Fthe-collection-snowboard-oxygen%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "https://crosslink-dev.myshopify.com/checkouts/cn/cee498f1df6bc482e99e66b06b28ccd0/thank_you"
+                        },
+                        {
+                            "purchase_shop_url": "crosslink-dev.myshopify.com",
+                            "rdir": "https://vantien-nguyen.myshopify.com/discount/CROSSDEVVVVTien?redirect=%2Fproducts%2Fthe-collection-snowboard-liquid%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "'https://crosslink-dev.myshopify.com/checkouts/cn/cee498f1df6bc482e99e66b06b28ccd0/thank_you"
+                        }
+                    ]
+                }
+            ],
+            "cross_sell_conversions": []
+        },
+        {
+            "shop_url": "crosslink-dev.myshopify.com",
+            "name": "CrossDev",
+            "status": "active",
+            "cms_product_ids": ["9228661784852", "9228672532756"],
+            "cross_sell_impressions": [
+                {
+                    "order_id": 5893229084751,
+                    "checkout_token": "471de81bca2be7569a1ef863ae16ef5c",
+                    "customer_id": 6529947238479,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "page_url": "https://vantien-nguyen.myshopify.com/checkouts/cn/0798f9234616205c792adb7e3af55ca6/thank_you",
+                    "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                    "recommended_shop_urls": [
+                        "crosslink-dev.myshopify.com",
+                        "crosslink-dev-1.myshopify.com"
+                    ],
+                    "clicks": [
+                        {
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                            "rdir": "https://crosslink-dev.myshopify.com/discount/CROSSDEVVF?redirect=%2Fproducts%2Frolex-oyster-perpetual-date-15223%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "https://vantien-nguyen.myshopify.com/checkouts/cn/0798f9234616205c792adb7e3af55ca6/thank_you"
+                        },
+                        {
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                            "rdir": "https://crosslink-dev-1.myshopify.com/discount/CROSSDEVVVV111111?redirect=%2Fproducts%2Fadidas-homme-samba-og-chaussures-de-fitness%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "https://vantien-nguyen.myshopify.com/checkouts/cn/0798f9234616205c792adb7e3af55ca6/thank_you"
+                        }
+                    ]
+                },
+                {
+                    "order_id": 5968517300455,
+                    "checkout_token": "0e60eaba848bcccddbeabd1953692991",
+                    "customer_id": 7557723226343,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "page_url": "https://crosslink-dev-1.myshopify.com/checkouts/cn/f78a8927b0c746324ab400d5df9395ea/thank_you",
+                    "purchase_shop_url": "crosslink-dev-1.myshopify.com",
+                    "recommended_shop_urls": [
+                        "vantien-nguyen.myshopify.com",
+                        "crosslink-dev.myshopify.com"
+                    ],
+                    "clicks": []
+                }
+            ],
+            "cross_sell_conversions": [
+                {
+                    "purchase_shop_url": "crosslink-dev.myshopify.com",
+                    "checkout_token": "0ea2742b1d482359a7960dfac2cd9675",
+                    "customer_id": 7964211052820,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "cms_variant_ids": ["48390474400020"],
+                    "quantities": [1],
+                    "sales": 7288.0,
+                    "impressions": [
+                        {
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com", 
+                            "checkout_token": "471de81bca2be7569a1ef863ae16ef5c"
+                        },
+                        {
+                            "purchase_shop_url": "crosslink-dev-1.myshopify.com", 
+                            "checkout_token": "0e60eaba848bcccddbeabd1953692991"
+                        }
+                    ], 
+                    "clicks": [
+                        {
+                            "impression": 1,
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                            "rdir": "https://crosslink-dev.myshopify.com/discount/CROSSDEVVF?redirect=%2Fproducts%2Frolex-oyster-perpetual-date-15223%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "shop_url": "crosslink-dev-1.myshopify.com",
+            "name": "CROSS DEV 1 TEST",
+            "status": "active",
+            "cms_product_ids": ["8952245649639", "8818157715687", "8818002362599"],
+            "cross_sell_impressions": [
+                {
+                    "order_id": 5893229084751,
+                    "checkout_token": "471de81bca2be7569a1ef863ae16ef5c",
+                    "customer_id": 6529947238479,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "page_url": "https://vantien-nguyen.myshopify.com/checkouts/cn/0798f9234616205c792adb7e3af55ca6/thank_you",
+                    "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                    "recommended_shop_urls": [
+                        "crosslink-dev.myshopify.com",
+                        "crosslink-dev-1.myshopify.com"
+                    ],
+                    "clicks": [
+                        {
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                            "rdir": "https://crosslink-dev.myshopify.com/discount/CROSSDEVVF?redirect=%2Fproducts%2Frolex-oyster-perpetual-date-15223%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "https://vantien-nguyen.myshopify.com/checkouts/cn/0798f9234616205c792adb7e3af55ca6/thank_you"
+                        },
+                        {
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                            "rdir": "https://crosslink-dev-1.myshopify.com/discount/CROSSDEVVVV111111?redirect=%2Fproducts%2Fadidas-homme-samba-og-chaussures-de-fitness%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "https://vantien-nguyen.myshopify.com/checkouts/cn/0798f9234616205c792adb7e3af55ca6/thank_you"
+                        }
+                    ]
+                },
+                {
+                    "order_id": 5957795315988,
+                    "checkout_token": "0ea2742b1d482359a7960dfac2cd9675",
+                    "customer_id": 7964211052820,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "page_url": "https://crosslink-dev.myshopify.com/checkouts/cn/cee498f1df6bc482e99e66b06b28ccd0/thank_you",
+                    "purchase_shop_url": "crosslink-dev.myshopify.com",
+                    "recommended_shop_urls": [
+                        "crosslink-dev-1.myshopify.com",
+                        "vantien-nguyen.myshopify.com"
+                    ],
+                    "clicks": [
+                        {
+                            "purchase_shop_url": "crosslink-dev.myshopify.com",
+                            "rdir": "https://vantien-nguyen.myshopify.com/discount/CROSSDEVVVVTien?redirect=%2Fproducts%2Fthe-collection-snowboard-oxygen%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "https://crosslink-dev.myshopify.com/checkouts/cn/cee498f1df6bc482e99e66b06b28ccd0/thank_you"
+                        }, 
+                        {
+                            "purchase_shop_url": "crosslink-dev.myshopify.com",
+                            "rdir": "https://vantien-nguyen.myshopify.com/discount/CROSSDEVVVVTien?redirect=%2Fproducts%2Fthe-collection-snowboard-liquid%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink",
+                            "checkout_page_url": "https://crosslink-dev.myshopify.com/checkouts/cn/cee498f1df6bc482e99e66b06b28ccd0/thank_you"
+                        }
+                    ]
+                }
+            ],
+            "cross_sell_conversions": [
+                {
+                    "purchase_shop_url": "crosslink-dev-1.myshopify.com",
+                    "checkout_token": "0e60eaba848bcccddbeabd1953692991",
+                    "customer_id": 7557723226343,
+                    "customer_email": "van-tien.nguyen@joinsqwad.com",
+                    "customer_first_name": "Van Tien",
+                    "customer_last_name": "NGUYEN",
+                    "cms_variant_ids": ["49924429906151"],
+                    "quantities": [1],
+                    "sales": 106.66,
+                    "impressions": [
+                        {
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com", 
+                            "checkout_token": "471de81bca2be7569a1ef863ae16ef5c"
+                        }
+                    ],
+                    "clicks": [
+                        {
+                            "purchase_shop_url": "vantien-nguyen.myshopify.com",
+                            "impression": 1, 
+                            "rdir": "https://crosslink-dev-1.myshopify.com/discount/CROSSDEVVVV111111?redirect=%2Fproducts%2Fadidas-homme-samba-og-chaussures-de-fitness%3Futm_campaign%3Dcrosslink%26utm_medium%3Dcrosslink%26utm_source%3Dcrosslink"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

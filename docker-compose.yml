@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./deployment/local/backend/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app/
+    environment:
+      - DJANGO_SETTINGS_MODULE=configs.settings.local
+    env_file:
+      - .envs/local/django
+      - .envs/local/postgres
+    container_name: django
+    command: /start
+    depends_on:
+      - postgres-db
+      - redis
+
+  postgres-db:
+    image: postgres:13
+    env_file: .envs/local/postgres
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+
+  worker:
+    build:
+      context: .
+      dockerfile: ./deployment/local/worker/Dockerfile
+    container_name: worker
+    command: /start-worker
+    environment:
+      - DJANGO_SETTINGS_MODULE=configs.settings.local
+    env_file:
+      - .envs/local/postgres
+      - .envs/local/django
+    volumes:
+      - .:/app/
+    depends_on:
+      - backend
+      - redis
