@@ -1,12 +1,13 @@
-from typing import Optional
+from typing import Dict
 
 from django.apps import apps
 from rest_framework.request import Request
 
-from home.dataclasses.cross_sell import CrossSellWidgetContext
 from home.models import CrossSellImpression, CrossSellWidget, Shop, WidgetStatus
 from home.services.recommendations import RecommendationService
 from home.utils import get_object_or_none
+
+from home.serializers import CrossSellImpressionSerializer, ShopSerializer
 
 
 class CrossSellHtmlService:
@@ -31,7 +32,7 @@ class CrossSellHtmlService:
         return cross_sell_impression
 
     @classmethod
-    def widget_context(cls, request: Request, size=2) -> Optional[CrossSellWidgetContext]:
+    def widget_context(cls, request: Request, size=2) -> Dict:
         purchase_shop = get_object_or_none(Shop, shop_url=request.GET.get("shop"))
         if not purchase_shop:
             return None
@@ -50,12 +51,20 @@ class CrossSellHtmlService:
         if not recommendations:
             return None
 
-        environment = apps.get_app_config("home").ENVIRONMENT
-        return CrossSellWidgetContext(
-            widget_impression,
-            purchase_shop,
-            request.GET.get("checkout_shipping_address_first_name"),
-            recommendations,
-            request.GET.get("jsonp"),
-            environment,
-        )
+        return {
+            "widget_impression": CrossSellImpressionSerializer(widget_impression).data,
+            "shop": ShopSerializer(purchase_shop).data,
+            "shipping_first_name": request.GET.get("checkout_shipping_address_first_name"),
+            "recommendations": recommendations,
+            "widget_callback": request.GET.get("jsonp"),
+            "environment": apps.get_app_config("home").ENVIRONMENT
+        }
+
+        # return CrossSellWidgetContext(
+        #     widget_impression,
+        #     purchase_shop,
+        #     request.GET.get("checkout_shipping_address_first_name"),
+        #     recommendations,
+        #     request.GET.get("jsonp"),
+        #     environment,
+        # )

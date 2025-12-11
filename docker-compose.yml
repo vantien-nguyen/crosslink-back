@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -21,11 +19,13 @@ services:
       - redis
 
   postgres-db:
-    image: postgres:13
+    image: postgres:13-alpine
     env_file: .envs/local/postgres
     container_name: postgres-db
     ports:
       - "5432:5432"
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
 
   redis:
     image: redis:6-alpine

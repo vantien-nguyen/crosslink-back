@@ -7,7 +7,7 @@ class ShopifyAppConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "shopify_app"
 
-    SHOPIFY_API_VERSION = os.environ.get("SHOPIFY_API_VERSION", "2023-04")
+    SHOPIFY_API_VERSION = os.environ.get("SHOPIFY_API_VERSION", "2025-07")
 
     SHOPIFY_API_SCOPES = [
         "read_discounts",

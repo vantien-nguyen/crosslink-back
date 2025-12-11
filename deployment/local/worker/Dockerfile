@@ -1,22 +1,62 @@
-FROM python:3.10-slim-buster as pre-application
+###################
+### Build stage ###
+###################
+FROM python:3.11-alpine AS build
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y build-essential libpq-dev
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    VIRTUAL_ENV=/venv \
+    PATH="/venv/bin:$PATH" \
+    APP_DIR=/app
 
-# Install poetry
-RUN python -m pip install --upgrade pip && pip install poetry==1.4.2
+# Install required build dependencies
+RUN apk add --no-cache build-base libpq postgresql-dev
 
-# App itself
-RUN mkdir /app
-WORKDIR /app
+# Create virtual environment & install dependencies
+RUN python -m venv ${VIRTUAL_ENV} && \
+    pip install --upgrade pip && \
+    pip install poetry
 
-ADD pyproject.toml poetry.lock /app/
-RUN poetry config virtualenvs.create false --local && poetry install --no-dev
+# Set working directory and install Python dependencies
+WORKDIR ${APP_DIR}
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-root && \
+    rm -rf /root/.cache/pip && \
+    find ${VIRTUAL_ENV} -name '__pycache__' -exec rm -r {} + && \
+    apk del build-base postgresql-dev  # Remove build tools
 
-ADD . /app/
+# Copy only necessary app files
+COPY . .
 
-COPY ./deployment/local/worker/start /start-worker
-RUN sed -i 's/\r$//g' /start-worker
-RUN chmod +x /start-worker
+#####################
+### Runtime stage ###
+#####################
+FROM python:3.11-alpine AS runtime
 
-WORKDIR /app/crosslink
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    VIRTUAL_ENV=/venv \
+    PATH="/venv/bin:$PATH" \
+    APP_DIR=/app \
+    WORKER_SCRIPT=/start-worker
+
+# Install only runtime dependencies
+RUN apk add --no-cache libpq bash
+
+# Set working directory
+WORKDIR ${APP_DIR}
+
+# Copy virtual environment and app code
+COPY --from=build ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY --from=build ${APP_DIR} ${APP_DIR}
+
+# Optimize binary size
+RUN strip --strip-unneeded /venv/bin/* || true
+
+# Prepare entrypoint
+COPY ./deployment/local/worker/start ${WORKER_SCRIPT}
+RUN sed -i 's/\r$//' ${WORKER_SCRIPT} && chmod +x ${WORKER_SCRIPT}
+
+# Set the working directory to the Django project root
+WORKDIR ${APP_DIR}/crosslink
+CMD ["/bin/sh", "/start-worker"]

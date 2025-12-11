@@ -18,6 +18,5 @@ def create_shop_resources(shop_url: str, access_token: str) -> None:
     shop.name = current_shop.name
     shop.email = current_shop.email
     shop.save()
-    shopify_service.create_script_tags()
-    shopify_service.create_webhooks()
+    # shopify_service.create_webhooks()
     save_cms_products.delay(shop.id)
