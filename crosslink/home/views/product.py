@@ -24,35 +24,24 @@ class ProductViewSet(ViewSet):
         offset = int(request.GET.get("offset", 0))
         shop_id = request.GET.get("shop_id")
         shop_url = request.GET.get("shop_url")
-        sort = request.GET.get("sort")  # e.g., 'price' or '-created_at'
+        sort = request.GET.get("sort")
 
-        # Build ES search
         search = ProductDocument.search()
 
-        # Full-text search
         if query:
             search = search.query("multi_match", query=query, fields=["title", "description"])
 
-        # Filter by shop_id or shop_url
         if shop_id:
             search = search.filter("term", shop_id=int(shop_id))
         if shop_url:
             search = search.filter("term", shop_url=shop_url)
 
-        # Sorting
         if sort:
             search = search.sort(sort)
 
-        # Total count
         total = search.count()
-
-        # Pagination
         results = search[offset : offset + limit].execute()
-
-        # Convert ES hits to dict
         products = [hit.to_dict() for hit in results]
-
-        # Serialize
         serializer = ProductESSerializer(products, many=True)
 
         return Response({"count": total, "results": serializer.data}, status=status.HTTP_200_OK)
