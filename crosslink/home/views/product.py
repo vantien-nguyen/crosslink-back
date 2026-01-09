@@ -1,5 +1,9 @@
+import hashlib
+import json
 import logging
+import redis
 
+from django.apps import apps
 from home.serializers import ProductESSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -12,6 +16,13 @@ from crosslink.home.documents.products import ProductDocument
 
 logger = logging.getLogger(__file__)
 
+redis_client = redis.StrictRedis(
+    host=apps.get_app_config("home").REDIS_HOST,
+    port=apps.get_app_config("home").REDIS_PORT,
+    db=apps.get_app_config("home").REDIS_DB,
+    password=apps.get_app_config("home").REDIS_PASSWORD,
+    decode_responses=True
+)
 
 class ProductViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
@@ -24,6 +35,12 @@ class ProductViewSet(ViewSet):
         shop_id = request.GET.get("shop_id")
         shop_url = request.GET.get("shop_url")
         sort = request.GET.get("sort")
+
+        cache_key = f"product_es:{hashlib.md5(json.dumps({'q': query, 'limit': limit, 'offset': offset, 'shop_id': shop_id, 'shop_url': shop_url, 'sort': sort}).encode()).hexdigest()}"
+
+        cached = redis_client.get(cache_key)
+        if cached:
+            return Response(json.loads(cached), status=status.HTTP_200_OK)
 
         search = ProductDocument.search()
 
@@ -42,5 +59,11 @@ class ProductViewSet(ViewSet):
         results = search[offset : offset + limit].execute()
         products = [hit.to_dict() for hit in results]
         serializer = ProductESSerializer(products, many=True)
+        response_data = {
+            "count": total,
+            "results": serializer.data
+        }
 
-        return Response({"count": total, "results": serializer.data}, status=status.HTTP_200_OK)
+        redis_client.set(cache_key, json.dumps(response_data), ex=300)
+
+        return Response(response_data, status=status.HTTP_200_OK)
