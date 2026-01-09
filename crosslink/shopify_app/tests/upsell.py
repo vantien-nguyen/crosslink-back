@@ -3,9 +3,6 @@ import random
 from unittest.mock import patch
 
 from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APITestCase
-
 from home.tests.factories import (
     ProductFactory,
     ShopFactory,
@@ -13,6 +10,8 @@ from home.tests.factories import (
     UpsellWidgetFactory,
     VariantFactory,
 )
+from rest_framework import status
+from rest_framework.test import APITestCase
 from users.tests.factories import UserFactory
 
 

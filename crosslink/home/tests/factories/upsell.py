@@ -1,14 +1,7 @@
 import factory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
-
-from home.models import (
-    DiscountType,
-    Shop,
-    UpsellConversion,
-    UpsellImpression,
-    UpsellWidget,
-)
+from home.models import DiscountType, Shop, UpsellConversion, UpsellImpression, UpsellWidget
 from home.tests.factories import VariantFactory, WidgetFactory, WidgetImpressionFactory
 
 

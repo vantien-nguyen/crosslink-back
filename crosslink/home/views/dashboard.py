@@ -2,17 +2,16 @@ from dataclasses import asdict
 from datetime import datetime
 
 import pytz
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.request import Request
-from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
-
 from home.models import Shop
 from home.permissions import CheckShopPermission
 from home.serializers import DashboardRequestSerializer
 from home.utils import get_object_or_none
 from home.views import BaseModelViewset
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class DashboardViewSet(BaseModelViewset):

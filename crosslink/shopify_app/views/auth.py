@@ -8,11 +8,10 @@ import shopify
 from django.apps import apps
 from django.shortcuts import redirect
 from django.urls import reverse
+from home.tasks import create_shop_resources
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from home.tasks import create_shop_resources
 
 logger = logging.getLogger(__file__)
 

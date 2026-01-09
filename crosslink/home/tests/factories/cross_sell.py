@@ -1,15 +1,7 @@
 import factory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
-
-from home.models import (
-    CrossSellClick,
-    CrossSellConversion,
-    CrossSellImpression,
-    CrossSellWidget,
-    Discount,
-    Shop,
-)
+from home.models import CrossSellClick, CrossSellConversion, CrossSellImpression, CrossSellWidget, Discount, Shop
 from home.tests.factories import WidgetFactory, WidgetImpressionFactory
 
 

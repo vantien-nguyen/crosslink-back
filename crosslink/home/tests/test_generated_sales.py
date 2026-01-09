@@ -1,5 +1,3 @@
-from rest_framework.test import APITestCase
-
 from home.tasks.generated_sales import generated_sales
 from home.tests.factories import (
     CrossSellClickFactory,
@@ -11,6 +9,7 @@ from home.tests.factories import (
     ShopFactory,
     VariantFactory,
 )
+from rest_framework.test import APITestCase
 
 
 class GeneratedSalesTestCase(APITestCase):

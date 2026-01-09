@@ -2,12 +2,11 @@ import json
 from unittest.mock import patch
 
 from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APITestCase
-
 from home.models import WidgetStatus
 from home.serializers import UpsellWidgetSerializer
 from home.tests.factories import ProductFactory, ShopFactory, UpsellWidgetFactory
+from rest_framework import status
+from rest_framework.test import APITestCase
 from users.tests.factories import UserFactory
 
 

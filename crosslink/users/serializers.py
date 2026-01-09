@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
-
 from users.models import User
 
 

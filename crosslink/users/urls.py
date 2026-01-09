@@ -1,14 +1,7 @@
 from django.urls import path
 from django.urls.conf import include
 from rest_framework import routers
-
-from users.views import (
-    CookieTokenBlacklistView,
-    CookieTokenRefreshView,
-    SignOutView,
-    UserViewset,
-    obtain_token_pairs,
-)
+from users.views import CookieTokenBlacklistView, CookieTokenRefreshView, SignOutView, UserViewset, obtain_token_pairs
 
 app_name = "users"
 

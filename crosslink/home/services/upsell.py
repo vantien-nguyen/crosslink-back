@@ -2,7 +2,6 @@ from typing import Dict
 
 import numpy as np
 from django.db.models import Q
-
 from home.models import Product, Shop, UpsellImpression, UpsellWidget, WidgetStatus
 from home.serializers import UpsellWidgetSerializer
 from home.utils import get_object_or_none

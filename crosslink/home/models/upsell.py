@@ -2,7 +2,6 @@ from decimal import Decimal
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-
 from home.models import DiscountType, Product, TimeStampMixin, Widget, WidgetImpression
 
 

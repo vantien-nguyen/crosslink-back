@@ -1,7 +1,6 @@
-from rest_framework import serializers
-
-from home.models import CrossSellWidget, CrossSellImpression
+from home.models import CrossSellImpression, CrossSellWidget
 from home.serializers.discount import DiscountSerializer
+from rest_framework import serializers
 
 
 class CrossSellWidgetSerializer(serializers.ModelSerializer):
@@ -14,7 +13,7 @@ class CrossSellWidgetSerializer(serializers.ModelSerializer):
 
 
 class CrossSellImpressionSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = CrossSellImpression
         fields = "__all__"

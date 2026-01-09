@@ -1,7 +1,6 @@
 import os.path
 
 import environ
-
 from configs.settings.common import *
 
 env = environ.Env()

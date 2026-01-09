@@ -1,16 +1,11 @@
 from typing import Dict
 
 import numpy as np
-from rest_framework import status
-from rest_framework.response import Response
-
 from home.models import CrossSellWidget, Discount, DiscountType
 from home.serializers import DiscountSerializer
-from home.tasks.discount import (
-    create_cms_discount,
-    delete_cms_discount,
-    update_cms_discount,
-)
+from home.tasks.discount import create_cms_discount, delete_cms_discount, update_cms_discount
+from rest_framework import status
+from rest_framework.response import Response
 
 
 class DiscountService:

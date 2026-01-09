@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "django_elasticsearch_dsl",
 ]
 
 MIDDLEWARE = [
@@ -141,3 +142,5 @@ SIMPLE_JWT = {
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379")
+
+ELASTICSEARCH_DSL = {"default": {"hosts": os.environ.get("ELASTICSEARCH_HOST", "http://elasticsearch:9200")}}

@@ -5,15 +5,8 @@ from typing import Dict, Tuple
 
 from django.apps import apps
 from django.db import models
-
 from home.dataclasses.dashboard import ShopActivity
-from home.models import (
-    CMS,
-    CrossSellClick,
-    CrossSellConversion,
-    CrossSellImpression,
-    TimeStampMixin,
-)
+from home.models import CMS, CrossSellClick, CrossSellConversion, CrossSellImpression, TimeStampMixin
 from home.models.upsell import UpsellConversion, UpsellImpression
 from home.utils import daterange, group_by_day, sum_by_day
 

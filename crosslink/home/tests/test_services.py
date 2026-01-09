@@ -2,19 +2,13 @@ import json
 from unittest.mock import patch
 
 from django.urls import reverse
-from rest_framework import status
-from rest_framework.request import Request
-from rest_framework.test import APIRequestFactory, APITestCase
-
 from home.dataclasses import CrossSellRecommendation, RecommendedProduct
 from home.services.cross_sell import CrossSellHtmlService
 from home.services.discount import DiscountService
-from home.tests.factories import (
-    CrossSellWidgetFactory,
-    DiscountFactory,
-    ProductFactory,
-    ShopFactory,
-)
+from home.tests.factories import CrossSellWidgetFactory, DiscountFactory, ProductFactory, ShopFactory
+from rest_framework import status
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory, APITestCase
 
 
 class CrossSellServicesTestCase(APITestCase):

@@ -5,7 +5,6 @@ from typing import Dict, List, Union
 
 import shopify
 from django.apps import apps
-
 from home.models import DiscountType, Shop
 
 logger = logging.getLogger(__name__)

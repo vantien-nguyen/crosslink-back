@@ -1,13 +1,11 @@
 from typing import Dict
 
 from django.apps import apps
-from rest_framework.request import Request
-
 from home.models import CrossSellImpression, CrossSellWidget, Shop, WidgetStatus
+from home.serializers import CrossSellImpressionSerializer, ShopSerializer
 from home.services.recommendations import RecommendationService
 from home.utils import get_object_or_none
-
-from home.serializers import CrossSellImpressionSerializer, ShopSerializer
+from rest_framework.request import Request
 
 
 class CrossSellHtmlService:
@@ -57,7 +55,7 @@ class CrossSellHtmlService:
             "shipping_first_name": request.GET.get("checkout_shipping_address_first_name"),
             "recommendations": recommendations,
             "widget_callback": request.GET.get("jsonp"),
-            "environment": apps.get_app_config("home").ENVIRONMENT
+            "environment": apps.get_app_config("home").ENVIRONMENT,
         }
 
         # return CrossSellWidgetContext(

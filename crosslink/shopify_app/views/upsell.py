@@ -6,15 +6,14 @@ from datetime import datetime
 import jwt
 from django.apps import apps
 from django.shortcuts import get_object_or_404
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.request import Request
-from rest_framework.response import Response
-
 from home.models import Shop
 from home.services.upsell import UpsellService
 from home.tasks.upsell import save_upsell_conversion
 from home.utils import get_object_or_none
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.request import Request
+from rest_framework.response import Response
 
 logger = logging.getLogger(__file__)
 

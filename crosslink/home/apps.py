@@ -8,6 +8,10 @@ class HomeConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "home"
 
+    def ready(self):
+        # Import Elasticsearch documents so they get registered on startup.
+        from home.documents import products  # noqa: F401
+
     # --- General ---
     APP_HOST = os.environ.get("APP_HOST")
     CLIENT_APP_HOST = os.environ.get("CLIENT_APP_HOST")

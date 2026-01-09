@@ -1,5 +1,4 @@
 from django.urls import path
-
 from shopify_app import views
 
 app_name = "shopify"

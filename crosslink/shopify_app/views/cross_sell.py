@@ -1,11 +1,10 @@
 import logging
 
+from home.services.cross_sell import CrossSellHtmlService
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
-
-from home.services.cross_sell import CrossSellHtmlService
 
 logger = logging.getLogger(__file__)
 

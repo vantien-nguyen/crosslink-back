@@ -1,7 +1,5 @@
 from django.urls import path
 from django.urls.conf import include
-from rest_framework import routers
-
 from home.views import (
     CrossSellWidgetViewSet,
     DashboardViewSet,
@@ -10,6 +8,7 @@ from home.views import (
     UpsellWidgetViewSet,
     health,
 )
+from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r"dashboard", DashboardViewSet, basename="dashboard")

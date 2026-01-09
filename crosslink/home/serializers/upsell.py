@@ -1,6 +1,5 @@
-from rest_framework import serializers
-
 from home.models import UpsellConversion, UpsellImpression, UpsellWidget
+from rest_framework import serializers
 
 
 class UpsellWidgetSerializer(serializers.ModelSerializer):

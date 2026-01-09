@@ -1,7 +1,6 @@
 import factory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
-
 from home.models import Product, Shop, Variant
 
 

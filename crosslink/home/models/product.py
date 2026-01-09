@@ -1,7 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Sum
-
 from home.models import TimeStampMixin
 
 

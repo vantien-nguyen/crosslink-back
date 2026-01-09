@@ -3,6 +3,8 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
+from home.models import Shop
+from home.utils import get_object_or_none
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,9 +13,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenRefreshView
-
-from home.models import Shop
-from home.utils import get_object_or_none
 from users.models import User
 from users.serializers import (
     CookieTokenRefreshSerializer,

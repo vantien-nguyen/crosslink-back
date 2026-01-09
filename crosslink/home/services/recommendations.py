@@ -1,15 +1,10 @@
-from typing import List, Dict
+from typing import Dict, List
 
 import numpy as np
-from rest_framework.request import Request
 from django.apps import apps
-
-from home.helpers.widget_helpers import (
-    build_visit_product_url,
-    build_visit_shop_url,
-    build_widget_url_params,
-)
+from home.helpers.widget_helpers import build_visit_product_url, build_visit_shop_url, build_widget_url_params
 from home.models import CrossSellImpression, Product, Shop, WidgetStatus
+from rest_framework.request import Request
 
 
 class RecommendationService:
@@ -70,7 +65,7 @@ class RecommendationService:
                     "price": str(product.price),
                     "final_price": str(product_final_price),
                     "visit_url": widget_visit_product_url,
-                    "image_url": product.image_url
+                    "image_url": product.image_url,
                 }
                 widget_products.append(widget_product)
 
@@ -82,7 +77,7 @@ class RecommendationService:
                     "code": discount.code,
                     "value": discount.standard_value(),
                     "value_type": discount.value_type,
-                    "status": discount.status
+                    "status": discount.status,
                 }
                 if discount
                 else None
@@ -104,7 +99,7 @@ class RecommendationService:
                     "widget_shop_name": str(cross_sell_widget.shop.name),
                     "shop_logo_url": str(cross_sell_widget.shop.logo_url),
                     "discount": cross_sell_discount | {},
-                    "widget_visit_shop_url": widget_visit_shop_url
+                    "widget_visit_shop_url": widget_visit_shop_url,
                 }
             )
         return recommendations

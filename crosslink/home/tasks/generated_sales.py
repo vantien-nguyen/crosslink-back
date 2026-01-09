@@ -4,15 +4,8 @@ from functools import reduce
 from typing import List
 
 from django.db.models import Q
-
 from home.celery import app
-from home.models import (
-    CrossSellClick,
-    CrossSellConversion,
-    CrossSellImpression,
-    CrossSellWidget,
-    Product,
-)
+from home.models import CrossSellClick, CrossSellConversion, CrossSellImpression, CrossSellWidget, Product
 from home.utils import get_object_or_none
 
 logger = logging.getLogger(__file__)

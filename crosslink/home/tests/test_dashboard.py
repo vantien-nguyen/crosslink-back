@@ -3,9 +3,6 @@ from decimal import Decimal
 
 import numpy as np
 from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APITestCase
-
 from home.tests.factories import (
     CrossSellClickFactory,
     CrossSellConversionFactory,
@@ -19,6 +16,8 @@ from home.tests.factories import (
     UpsellWidgetFactory,
     VariantFactory,
 )
+from rest_framework import status
+from rest_framework.test import APITestCase
 from users.tests.factories import UserFactory
 
 
