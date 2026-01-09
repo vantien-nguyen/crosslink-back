@@ -1,4 +1,3 @@
-# home/views/product_es.py
 import logging
 
 from home.serializers import ProductESSerializer
