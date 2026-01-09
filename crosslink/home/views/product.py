@@ -1,8 +1,8 @@
 import hashlib
 import json
 import logging
-import redis
 
+import redis
 from django.apps import apps
 from home.serializers import ProductESSerializer
 from rest_framework import status
@@ -16,13 +16,16 @@ from crosslink.home.documents.products import ProductDocument
 
 logger = logging.getLogger(__file__)
 
+# Redis client for caching
+# For demo purpose, not really useful in this case
 redis_client = redis.StrictRedis(
     host=apps.get_app_config("home").REDIS_HOST,
     port=apps.get_app_config("home").REDIS_PORT,
     db=apps.get_app_config("home").REDIS_DB,
     password=apps.get_app_config("home").REDIS_PASSWORD,
-    decode_responses=True
+    decode_responses=True,
 )
+
 
 class ProductViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
@@ -59,10 +62,7 @@ class ProductViewSet(ViewSet):
         results = search[offset : offset + limit].execute()
         products = [hit.to_dict() for hit in results]
         serializer = ProductESSerializer(products, many=True)
-        response_data = {
-            "count": total,
-            "results": serializer.data
-        }
+        response_data = {"count": total, "results": serializer.data}
 
         redis_client.set(cache_key, json.dumps(response_data), ex=300)
 
