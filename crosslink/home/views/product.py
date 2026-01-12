@@ -1,9 +1,7 @@
-import hashlib
-import json
 import logging
 
-import redis
-from django.apps import apps
+from home.documents.products import ProductDocument
+from home.models import Product
 from home.serializers import ProductESSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -12,19 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from crosslink.home.documents.products import ProductDocument
-
 logger = logging.getLogger(__file__)
-
-# Redis client for caching
-# For demo purpose, not really useful in this case
-redis_client = redis.StrictRedis(
-    host=apps.get_app_config("home").REDIS_HOST,
-    port=apps.get_app_config("home").REDIS_PORT,
-    db=apps.get_app_config("home").REDIS_DB,
-    password=apps.get_app_config("home").REDIS_PASSWORD,
-    decode_responses=True,
-)
 
 
 class ProductViewSet(ViewSet):
@@ -38,12 +24,6 @@ class ProductViewSet(ViewSet):
         shop_id = request.GET.get("shop_id")
         shop_url = request.GET.get("shop_url")
         sort = request.GET.get("sort")
-
-        cache_key = f"product_es:{hashlib.md5(json.dumps({'q': query, 'limit': limit, 'offset': offset, 'shop_id': shop_id, 'shop_url': shop_url, 'sort': sort}).encode()).hexdigest()}"
-
-        cached = redis_client.get(cache_key)
-        if cached:
-            return Response(json.loads(cached), status=status.HTTP_200_OK)
 
         search = ProductDocument.search()
 
@@ -61,9 +41,25 @@ class ProductViewSet(ViewSet):
         total = search.count()
         results = search[offset : offset + limit].execute()
         products = [hit.to_dict() for hit in results]
+
+        product_ids = [doc["id"] for doc in products]
+        db_products = Product.objects.filter(id__in=product_ids).select_related("shop").prefetch_related("variants")
+        product_map = {product.id: product for product in db_products}
+
+        for doc in products:
+            product = product_map.get(doc["id"])
+            if not product:
+                doc["price"] = "0.00"
+                doc["inventory_quantity"] = 0
+                doc["image_url"] = ""
+                continue
+
+            first_variant = product.variants.first()
+            doc["price"] = str(first_variant.price) if first_variant else "0.00"
+            doc["inventory_quantity"] = product.inventory_quantity or 0
+            doc["image_url"] = product.image_url or ""
+
         serializer = ProductESSerializer(products, many=True)
         response_data = {"count": total, "results": serializer.data}
-
-        redis_client.set(cache_key, json.dumps(response_data), ex=300)
 
         return Response(response_data, status=status.HTTP_200_OK)

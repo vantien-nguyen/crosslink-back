@@ -21,23 +21,20 @@ class ProductESSerializer(serializers.Serializer):
     shop_id = serializers.IntegerField()
     shop_url = serializers.CharField()
     created_at = serializers.DateTimeField()
+    price = serializers.CharField()
+    inventory_quantity = serializers.IntegerField()
+    image_url = serializers.CharField()
 
-    # Computed fields
     shortened_title = serializers.SerializerMethodField()
-    price = serializers.SerializerMethodField()
-    inventory_quantity = serializers.SerializerMethodField()
+
+    # We pass a product map to avoid multiple DB hits
+    def __init__(self, instance=None, product_map=None, **kwargs):
+        super().__init__(instance, **kwargs)
+        self.product_map = product_map or {}
 
     def get_shortened_title(self, obj):
-        # obj is a dict from ES
         title = obj.get("title", "")
         return title[:40] + "..." if len(title) > 40 else title
-
-    def get_price(self, obj):
-        # If you indexed price in ES, use it. Otherwise default to 0
-        return obj.get("price", "0.00")
-
-    def get_inventory_quantity(self, obj):
-        return obj.get("inventory_quantity", 0)
 
 
 class VariantSerializer(serializers.ModelSerializer):

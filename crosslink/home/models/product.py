@@ -19,7 +19,7 @@ class Product(TimeStampMixin):
 
     @property
     def price(self) -> str:
-        variant = self.variants.all().first()
+        variant = self.variants.select_related("product").first()
         return variant.price if variant else ""
 
     @property

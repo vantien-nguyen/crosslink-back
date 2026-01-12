@@ -21,7 +21,11 @@ class CrossSellWidget(Widget):
 
     @property
     def detailed_products(self) -> List:
-        products = self.shop.products.filter(cms_product_id__in=self.cms_product_ids).all()
+        products = (
+            self.shop.products.filter(cms_product_id__in=self.cms_product_ids)
+            .select_related("shop")
+            .prefetch_related("variants")
+        )
 
         from home.serializers.product import ProductSerializer
 

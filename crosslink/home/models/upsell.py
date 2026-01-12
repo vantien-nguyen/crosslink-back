@@ -35,14 +35,18 @@ class UpsellWidget(Widget):
 
     @property
     def detailed_trigger_products(self) -> dict:
-        products = Product.objects.filter(shop=self.shop, cms_product_id__in=self.trigger_product_ids)
+        products = (
+            Product.objects.filter(shop=self.shop, cms_product_id__in=self.trigger_product_ids)
+            .select_related("shop")
+            .prefetch_related("variants")
+        )
         from home.serializers import ProductSerializer
 
         return ProductSerializer(products, many=True).data
 
     @property
     def detailed_variants(self) -> dict:
-        product = Product.objects.get(shop=self.shop, cms_product_id=self.upsell_product_id)
+        product = Product.objects.get(shop=self.shop, cms_product_id=self.upsell_product_id).select_related("product")
         variants = product.variants.all()
         return [
             {
