@@ -1,41 +1,96 @@
+version: "3.9"
+
 services:
+  ##################
+  # Postgres DB
+  ##################
+  postgres-db:
+    image: postgres:13-alpine
+    container_name: postgres-db
+    env_file:
+      - .envs/local/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  ##################
+  # Redis
+  ##################
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  ##################
+  # Elasticsearch
+  ##################
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    container_name: elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  ##################
+  # Kafka + Zookeeper
+  ##################
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  ##################
+  # Backend Django
+  ##################
   backend:
     build:
       context: .
       dockerfile: ./deployment/local/backend/Dockerfile
+    container_name: django
+    command: /start
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app/
     environment:
       - DJANGO_SETTINGS_MODULE=configs.settings.local
     env_file:
       - .envs/local/django
       - .envs/local/postgres
-    container_name: django
-    command: /start
+    volumes:
+      - .:/app/
     depends_on:
       - postgres-db
       - redis
       - elasticsearch
+      - kafka
 
-  postgres-db:
-    image: postgres:13-alpine
-    env_file: .envs/local/postgres
-    container_name: postgres-db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
-
-  redis:
-    image: redis:6-alpine
-    container_name: redis
-    expose:
-      - "6379"
-    ports:
-      - "6379:6379"
-
+  ##################
+  # Worker (Celery)
+  ##################
   worker:
     build:
       context: .
@@ -52,18 +107,35 @@ services:
     depends_on:
       - backend
       - redis
-    
-  elasticsearch:
-    image: elasticsearch:8.12.0
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    ports:
-      - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - kafka
 
+  ##################
+  # Kafka Consumer
+  ##################
+  consumer:
+    build:
+      context: .
+      dockerfile: ./deployment/local/kafka/Dockerfile
+    container_name: kafka-consumer
+    command: /start-kafka
+    environment:
+      - DJANGO_SETTINGS_MODULE=configs.settings.local
+      - PYTHONPATH=/app/crosslink
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=shopify-products
+      - KAFKA_GROUP_ID=shopify-product-consumer
+    env_file:
+      - .envs/local/postgres
+      - .envs/local/django
+    volumes:
+      - .:/app/
+    depends_on:
+      - kafka
+      - backend
+      - postgres-db
+
+##################
+# Volumes
+##################
 volumes:
   esdata:

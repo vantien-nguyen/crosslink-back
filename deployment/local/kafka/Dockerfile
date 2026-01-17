@@ -41,7 +41,8 @@ FROM python:3.11-slim AS runtime
 ENV PYTHONUNBUFFERED=1 \
     VIRTUAL_ENV=/venv \
     PATH="/venv/bin:$PATH" \
-    APP_DIR=/app
+    APP_DIR=/app \
+    KAFKA_SCRIPT=/start-kafka
 
 # Runtime deps only
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -56,10 +57,13 @@ WORKDIR ${APP_DIR}
 COPY --from=build ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY --from=build ${APP_DIR} ${APP_DIR}
 
-# Entrypoint
-COPY ./deployment/local/backend/entrypoint.sh /entrypoint.sh
-COPY ./deployment/local/backend/start /start
-RUN sed -i 's/\r$//' /entrypoint.sh /start && chmod +x /entrypoint.sh /start
+# Optimize binary size
+RUN strip --strip-unneeded /venv/bin/* || true
 
-EXPOSE 8000
-CMD ["/bin/bash", "/entrypoint.sh"]
+# Entrypoint
+COPY ./deployment/local/kafka/start ${KAFKA_SCRIPT}
+RUN sed -i 's/\r$//' ${KAFKA_SCRIPT} && chmod +x ${KAFKA_SCRIPT}
+
+# Set the working directory to the Django project root
+WORKDIR ${APP_DIR}/crosslink
+CMD ["/bin/sh", "/start-kafka"]

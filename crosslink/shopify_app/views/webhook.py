@@ -5,122 +5,151 @@ import json
 import logging
 
 from django.apps import apps
-from home.models import Product, Shop, Variant
+from home.kafka.producer import send_product_event
+from home.models import Shop
 from home.utils import get_object_or_none
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from shopify_app.models import ShopifyWebhookEvent
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 def verify_webhook(data, hmac_header):
     secret_key = apps.get_app_config("shopify_app").SHOPIFY_API_SECRET_KEY
-    digest = hmac.new(secret_key.encode("utf-8"), data, digestmod=hashlib.sha256).digest()
+    digest = hmac.new(
+        secret_key.encode("utf-8"),
+        data,
+        digestmod=hashlib.sha256,
+    ).digest()
     computed_hmac = base64.b64encode(digest)
-
     return hmac.compare_digest(computed_hmac, hmac_header.encode("utf-8"))
 
 
-@api_view(("POST",))
+def is_duplicate_webhook(request):
+    webhook_id = request.headers.get("X-Shopify-Webhook-Id")
+    if webhook_id and ShopifyWebhookEvent.objects.filter(webhook_id=webhook_id).exists():
+        return True
+
+    if webhook_id:
+        ShopifyWebhookEvent.objects.create(webhook_id=webhook_id)
+
+    return False
+
+
+@api_view(["POST"])
 def product_create(request):
-    verified = verify_webhook(request.body, request.headers.get("X-Shopify-Hmac-SHA256"))
-    if not verified:
-        return Response({}, status=status.HTTP_401_UNAUTHORIZED)
+    hmac_header = request.headers.get("X-Shopify-Hmac-SHA256")
+    if not hmac_header or not verify_webhook(request.body, hmac_header):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    if is_duplicate_webhook(request):
+        return Response(status=status.HTTP_200_OK)
 
     data = json.loads(request.body)
-    if data["status"] == "active":
-        shop = get_object_or_none(Shop, shop_url=request.headers.get("X-Shopify-Shop-Domain"))
-        product = Product.objects.create(
-            shop=shop,
-            cms_product_id=data["id"],
-            title=data["title"],
-            image_url=data["image"]["src"],
-            image_urls=[img["src"] for img in data["images"]],
-            cms_product_handle=data["handle"],
-            variant_options=[{"name": option["name"], "values": option["values"]} for option in data["options"]],
-            description=data["body_html"],
-        )
 
-        for variant in data["variants"]:
-            image = [img for img in data["images"] if variant["id"] in img["variant_ids"]]
-            Variant.objects.create(
-                shop_url=shop.shop_url,
-                product=product,
-                cms_variant_id=variant["id"],
-                image_url=image[0]["src"] if image else None,
-                price=variant["price"],
-                title=variant["title"],
-                options=[
-                    variant["option1"],
-                    variant["option2"],
-                    variant["option3"],
-                ],
-                inventory_quantity=variant["inventory_quantity"],
-            )
+    if data.get("status") != "active":
+        return Response(status=status.HTTP_200_OK)
 
-        return Response({"message": "Product created"}, status=status.HTTP_201_CREATED)
-    return Response({"message": "Ok"}, status=status.HTTP_200_OK)
+    shop = get_object_or_none(
+        Shop,
+        shop_url=request.headers.get("X-Shopify-Shop-Domain"),
+    )
+    if not shop:
+        return Response(status=status.HTTP_200_OK)
+
+    send_product_event(
+        event_type="create",
+        product_data={
+            "shop_id": shop.id,
+            "id": data["id"],
+            "title": data.get("title"),
+            "handle": data.get("handle"),
+            "description": data.get("body_html"),
+            "image_url": (data.get("image") or {}).get("src"),
+            "image_urls": [img["src"] for img in data.get("images", [])],
+            "variant_options": data.get("options", []),
+            "variants": data.get("variants", []),
+            "images": data.get("images", []),
+        },
+    )
+
+    return Response(status=status.HTTP_201_CREATED)
 
 
-@api_view(("POST",))
+@api_view(["POST"])
 def product_update(request):
-    verified = verify_webhook(request.body, request.headers.get("X-Shopify-Hmac-SHA256"))
-    if not verified:
-        return Response({}, status=status.HTTP_401_UNAUTHORIZED)
+    hmac_header = request.headers.get("X-Shopify-Hmac-Sha256")
+    if not hmac_header or not verify_webhook(request.body, hmac_header):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    if is_duplicate_webhook(request):
+        return Response(status=status.HTTP_200_OK)
 
     data = json.loads(request.body)
-    if data["status"] == "active":
-        shop = get_object_or_none(Shop, shop_url=request.headers.get("X-Shopify-Shop-Domain"))
-        product, _ = Product.objects.update_or_create(
-            shop=shop,
-            cms_product_id=data["id"],
-            defaults={
-                "title": data["title"],
-                "description": data["body_html"],
-                "cms_product_handle": data["handle"],
-                "image_urls": [img["src"] for img in data["images"]],
-                "image_url": data["image"]["src"],
-                "variant_options": [{"name": option["name"], "values": option["values"]} for option in data["options"]],
+
+    shop = get_object_or_none(
+        Shop,
+        shop_url=request.headers.get("X-Shopify-Shop-Domain"),
+    )
+    if not shop:
+        return Response(status=status.HTTP_200_OK)
+
+    # If product is no longer active → delete
+    if data.get("status") != "active":
+        send_product_event(
+            event_type="delete",
+            product_data={
+                "shop_id": shop.id,
+                "id": data["id"],
             },
         )
+        return Response(status=status.HTTP_200_OK)
 
-        saved_variant_ids = []
-        for variant in data["variants"]:
-            saved_variant_ids.append(variant["id"])
-            image = [img for img in data["images"] if variant["id"] in img["variant_ids"]]
-            variant, _ = Variant.objects.update_or_create(
-                shop_url=shop.shop_url,
-                product=product,
-                cms_variant_id=variant["id"],
-                defaults={
-                    "image_url": image[0]["src"] if image else None,
-                    "price": variant["price"],
-                    "title": variant["title"],
-                    "options": [
-                        variant["option1"],
-                        variant["option2"],
-                        variant["option3"],
-                    ],
-                    "inventory_quantity": variant["inventory_quantity"],
-                },
-            )
-        Variant.objects.filter(shop_url=shop.shop_url, product=product).exclude(
-            cms_variant_id__in=saved_variant_ids
-        ).delete()
-    else:
-        Product.objects.filter(cms_product_id=data["id"]).delete()
+    send_product_event(
+        event_type="update",
+        product_data={
+            "shop_id": shop.id,
+            "id": data["id"],
+            "title": data.get("title"),
+            "handle": data.get("handle"),
+            "description": data.get("body_html"),
+            "image_url": (data.get("image") or {}).get("src"),
+            "image_urls": [img["src"] for img in data.get("images", [])],
+            "variant_options": data.get("options", []),
+            "variants": data.get("variants", []),
+            "images": data.get("images", []),
+        },
+    )
 
-    return Response({"message": "Product updated"}, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_200_OK)
 
 
-@api_view(("POST",))
+@api_view(["POST"])
 def product_delete(request):
-    verified = verify_webhook(request.body, request.headers.get("X-Shopify-Hmac-SHA256"))
-    if not verified:
-        return Response({}, status=status.HTTP_401_UNAUTHORIZED)
+    hmac_header = request.headers.get("X-Shopify-Hmac-Sha256")
+    if not hmac_header or not verify_webhook(request.body, hmac_header):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    if is_duplicate_webhook(request):
+        return Response(status=status.HTTP_200_OK)
 
     data = json.loads(request.body)
-    Product.objects.filter(cms_product_id=data["id"]).delete()
 
-    return Response({"message": "Product deleted."}, status=status.HTTP_200_OK)
+    shop = get_object_or_none(
+        Shop,
+        shop_url=request.headers.get("X-Shopify-Shop-Domain"),
+    )
+    if not shop:
+        return Response(status=status.HTTP_200_OK)
+
+    send_product_event(
+        event_type="delete",
+        product_data={
+            "shop_id": shop.id,
+            "id": data["id"],
+        },
+    )
+
+    return Response(status=status.HTTP_200_OK)

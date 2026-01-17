@@ -1,59 +1,66 @@
 ###################
 ### Build stage ###
 ###################
-FROM python:3.11-alpine AS build
+FROM python:3.11-slim AS build
 
-# Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     VIRTUAL_ENV=/venv \
     PATH="/venv/bin:$PATH" \
     APP_DIR=/app
 
-# Install required build dependencies
-RUN apk add --no-cache build-base libpq postgresql-dev
+# Install build dependencies (glibc-based)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libpq-dev \
+    librdkafka-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create virtual environment & install dependencies
+# Create virtual environment
 RUN python -m venv ${VIRTUAL_ENV} && \
     pip install --upgrade pip && \
     pip install poetry
 
-# Set working directory and install Python dependencies
 WORKDIR ${APP_DIR}
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-root && \
-    rm -rf /root/.cache/pip && \
-    find ${VIRTUAL_ENV} -name '__pycache__' -exec rm -r {} + && \
-    apk del build-base postgresql-dev  # Remove build tools
 
-# Copy only necessary app files
+# Install Python deps
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-root --no-interaction --no-ansi && \
+    rm -rf /root/.cache/pip
+
+# Copy application code
 COPY . .
+
 
 #####################
 ### Runtime stage ###
 #####################
-FROM python:3.11-alpine AS runtime
+FROM python:3.11-slim AS runtime
 
-# Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     VIRTUAL_ENV=/venv \
     PATH="/venv/bin:$PATH" \
     APP_DIR=/app \
     WORKER_SCRIPT=/start-worker
 
-# Install only runtime dependencies
-RUN apk add --no-cache libpq bash
+# Runtime deps only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    librdkafka1 \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR ${APP_DIR}
 
-# Copy virtual environment and app code
+# Copy venv + app
 COPY --from=build ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY --from=build ${APP_DIR} ${APP_DIR}
 
 # Optimize binary size
 RUN strip --strip-unneeded /venv/bin/* || true
 
-# Prepare entrypoint
+# Entrypoint
 COPY ./deployment/local/worker/start ${WORKER_SCRIPT}
 RUN sed -i 's/\r$//' ${WORKER_SCRIPT} && chmod +x ${WORKER_SCRIPT}
 

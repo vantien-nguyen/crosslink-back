@@ -13,7 +13,7 @@ class HomeConfig(AppConfig):
         from home.documents import products  # noqa: F401
 
     # --- General ---
-    APP_HOST = os.environ.get("APP_HOST")
+    APP_HOST = os.environ.get("BACKEND_APP_HOST")
     CLIENT_APP_HOST = os.environ.get("CLIENT_APP_HOST")
     ENVIRONMENT = os.environ.get("ENVIRONMENT")
     CLIENT_LOGIN_ROUTE = "login"

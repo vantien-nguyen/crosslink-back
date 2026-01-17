@@ -19,3 +19,5 @@ init_data:
 generate_fake_catalog:
 	docker exec django python crosslink/manage.py generate_fake_catalog --shops 50 --products-per-shop 2000 --max-variants 4
 
+generate_products:
+	docker exec django python crosslink/manage.py generate_products --shops 50 --products 10000 --variants 3
