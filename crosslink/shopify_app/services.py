@@ -330,7 +330,11 @@ class ShopifyApiService:
         )
 
     def create_webhooks(self) -> None:
-        app_host = apps.get_app_config("home").APP_HOST
+        app_host = (
+            "https://doctrinal-aliana-uncombated.ngrok-free.dev"
+            if apps.get_app_config("home").is_local()
+            else apps.get_app_config("home").APP_HOST
+        )
         webhooks = [
             {
                 "topic": "PRODUCTS_CREATE",

@@ -1,7 +1,7 @@
 import logging
 
-from home.documents.products import ProductDocument
 from home.models import Product
+from home.search.documents import ProductDocument
 from home.serializers import ProductESSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -28,7 +28,7 @@ class ProductViewSet(ViewSet):
         search = ProductDocument.search()
 
         if query:
-            search = search.query("multi_match", query=query, fields=["title", "description"])
+            search = search.query("multi_match", query=query, fields=["title", "description", "variants.title"])
 
         if shop_id:
             search = search.filter("term", shop_id=int(shop_id))
@@ -39,27 +39,38 @@ class ProductViewSet(ViewSet):
             search = search.sort(sort)
 
         total = search.count()
+        # Execute search with pagination
         results = search[offset : offset + limit].execute()
-        products = [hit.to_dict() for hit in results]
 
-        product_ids = [doc["id"] for doc in products]
+        # Fetch DB products
+        product_ids = [int(hit.meta.id) for hit in results]
         db_products = Product.objects.filter(id__in=product_ids).select_related("shop").prefetch_related("variants")
-        product_map = {product.id: product for product in db_products}
+        product_map = {p.id: p for p in db_products}
 
-        for doc in products:
-            product = product_map.get(doc["id"])
-            if not product:
-                doc["price"] = "0.00"
-                doc["inventory_quantity"] = 0
-                doc["image_url"] = ""
-                continue
+        # Build products list with all fields the serializer expects
+        products = []
+        for hit in results:
+            product = product_map.get(int(hit.meta.id))
+            doc = hit.to_dict()
 
-            first_variant = product.variants.first()
-            doc["price"] = str(first_variant.price) if first_variant else "0.00"
-            doc["inventory_quantity"] = product.inventory_quantity or 0
-            doc["image_url"] = product.image_url or ""
+            # Ensure all serializer fields exist
+            doc_full = {
+                "id": int(hit.meta.id),
+                "title": doc.get("title", ""),
+                "description": doc.get("description", ""),  # <- add default empty string
+                "cms_product_id": product.cms_product_id if product else "",
+                "cms_product_handle": product.cms_product_handle if product else "",
+                "shop_id": product.shop.id if product else None,
+                "shop_url": product.shop.shop_url if product else "",
+                "created_at": product.created_at if product else None,
+                "price": str(product.variants.first().price) if product and product.variants.exists() else "0.00",
+                "inventory_quantity": product.inventory_quantity if product else 0,
+                "image_url": product.image_url if product else "",
+            }
+            products.append(doc_full)
 
+        # Serialize
         serializer = ProductESSerializer(products, many=True)
-        response_data = {"count": total, "results": serializer.data}
+        response_data = {"count": search.count(), "results": serializer.data}
 
         return Response(response_data, status=status.HTTP_200_OK)

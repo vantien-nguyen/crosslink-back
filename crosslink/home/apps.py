@@ -10,7 +10,7 @@ class HomeConfig(AppConfig):
 
     def ready(self):
         # Import Elasticsearch documents so they get registered on startup.
-        from home.documents import products  # noqa: F401
+        from home.search import documents, signals  # noqa: F401
 
     # --- General ---
     APP_HOST = os.environ.get("BACKEND_APP_HOST")
